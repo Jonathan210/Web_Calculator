@@ -46,6 +46,14 @@
             width: 100%;
         }
 
+        .container-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
         @media (max-width: 1024px) {
             .container {
                 grid-template-columns: 1fr;
@@ -95,6 +103,8 @@
             font-family: 'JetBrains Mono', monospace;
             text-align: center;
         }
+
+        
 
         .modes-container {
             display: flex;
@@ -252,11 +262,10 @@
         <source src="download.mp4" type="video/mp4">
     </video>
 
-    <div class="container">
-
+    <div class="container-display">
         <div class="display-container">
             <div id="main-expression">0</div>
-           
+
             <div class="modes-container">
                 <div class="modes">
                     <span id="lbl-hex">HEX</span>
@@ -265,9 +274,10 @@
                     <div id="val-hex">0</div>
                 </div>
             </div>
-            
         </div>
+    </div>
 
+    <div class="container">
         <div class="buttons-container">
             <h1>
                 <center>Base Converter</center>
@@ -476,6 +486,7 @@
 
 
 </html>
+
 
 
 
