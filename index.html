@@ -35,7 +35,7 @@
             height: 100%;
             object-fit: cover;
             z-index: -1;
-            filter: brightness(0.2);
+            filter: brightness(0.6);
         }
 
         .container {
@@ -84,6 +84,7 @@
             color: #fff;
             text-align: center;
             font-weight: bolder;
+            letter-spacing: 3px;
             font-family: "Schoolbell", cursive;
         }
 
@@ -254,6 +255,7 @@
 
         body.light-mode .darkmode:hover {
             background: #ffffff;
+
             color: rgb(0, 0, 0);
         }
 
@@ -269,13 +271,10 @@
     <audio id="bgMusic" src="Gustixa - lemon tree.mp3" loop></audio>
     <!-- src="Gustixa - lemon tree.mp3" -->
     <video autoplay muted loop id="bg-video">
-        <source src="darkmode11.mp4.mp4" type="video/mp4">
+        <source src="darkmode11.mp4" type="video/mp4">
     </video>
 
     <div class="container">
-
-
-
         <div class="buttons-container">
             <h1>Hexadecimal Calculator</h1>
 
@@ -478,7 +477,7 @@
             } else {
                 document.body.classList.remove("light-mode");
                 darkModeBtn.textContent = "Light";
-                bgVideoSource.src = "darkmode.mp4";
+                bgVideoSource.src = "darkmode11.mp4";
             }
             bgVideo.load();
         }
