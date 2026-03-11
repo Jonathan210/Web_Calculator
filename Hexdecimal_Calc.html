@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programmer Calculator</title>
+    <link rel="icon" href="icons8-calculator-48.png" type="image/x-icon" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Caveat:wght@400..700&family=Cherry+Bomb+One&family=DynaPuff:wght@400..700&family=Fauna+One&family=Lobster&family=Schoolbell&family=Science+Gothic:wght@100..900&family=Stack+Sans+Headline:wght@200..700&family=Stack+Sans+Notch:wght@200..700&family=Zalando+Sans+Expanded:ital@0;1&display=swap" 
+        rel="stylesheet">
+
+    <style>
+        
+        * {
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 5px 10px 5px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a1a;
+            overflow-x: hidden;
+        }
+
+        #bg-video {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: brightness(0.6);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        @media (max-width: 1000px) {
+            .container {
+                padding: 5px 5px 5px 5px;
+                gap: 5px;
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .display-container,
+        .buttons-container {
+            padding: clamp(20px, 4vw, 40px);
+            border-radius: 30px;
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, .7);
+            border: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        #main-expression {
+            text-align: right;
+            font-size: clamp(28px, 6vw, 70px);
+            color: #fff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            min-height: 60px;
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+        }
+
+        h1 {
+            font-size: clamp(20px, 7vw, 50px);
+            color: #fff;
+            text-align: center;
+            font-weight: bolder;
+            letter-spacing: 3px;
+            font-family: "Schoolbell", cursive;
+        }
+
+        p {
+            font-size: clamp(3px, 6vw, 20px);
+            color: #fff;
+            text-align: center;
+            font-weight: 500;
+            letter-spacing: 8px;
+            font-family: "Schoolbell", cursive;
+        }
+
+        .modes-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .modes span {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 100;
+            font-size: 2.5rem;
+            color: #ffffff;
+        }
+
+        .values div {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            text-align: right;
+            color: #ffffff;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            height: clamp(40px, 8vw, 70px);
+            font-size: clamp(16px, 3vw, 22px);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            background-color: #a8ffa8;
+        }
+
+        .op {
+            background: #FFB6C1;
+        }
+
+        .equal {
+            background: #ff782e;
+            color: white;
+        }
+
+        .clear {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        .play {
+            background: #b84dff;
+            color: white;
+        }
+
+        .backspace {
+            background: #6b6eff;
+            color: white;
+        }
+
+        .darkmode {
+            background: #858585;
+            color: rgb(0, 0, 0);
+        }
+
+        .darkmode:hover {
+            background: #000000;
+            color: white;
+        }
+
+        .display {
+            background: #ff006a;
+            color: white;
+        }
+        
+        .color {
+            background: #ffe75c;
+            color: rgb(0, 0, 0);
+        }
+
+        /* .display:hover {
+            background: #ff00c8;
+            color: white;
+        } */
+
+        /* LIGHT MODE */
+
+        body.light-mode #bg-video {
+            filter: brightness(0.6);
+        }
+
+        body.light-mode .display-container,
+        body.light-mode .buttons-container {
+            background: rgba(255, 255, 255, 0.322);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode #main-expression,
+        body.light-mode h1,
+        body.light-mode .modes-container {
+            color: #222;
+        }
+        
+        body.light-mode p
+        {
+            color: #000000;
+        }
+
+        body.light-mode button {
+            background: #ffffff9c;
+            color: #000000;
+        }
+
+        body.light-mode button:hover {
+            transform: translateY(-2px);
+            background-color: #a8ffa8;
+        }
+
+        body.light-mode .modes span {
+            color: #000000;
+        }
+
+        body.light-mode .values div {
+            color: #000000;
+        }
+
+        body.light-mode .op {
+            background: #FFB6C1;
+        }
+
+        body.light-mode .equal {
+            background: #ff782e;
+            color: white;
+        }
+
+        body.light-mode .clear {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        body.light-mode .play {
+            background: #b84dff;
+            color: white;
+        }
+
+        body.light-mode .backspace {
+            background: #6b6eff;
+            color: white;
+        }
+
+        body.light-mode .darkmode {
+            background: #3f3f3fa1;
+            color: white;
+        }
+
+        body.light-mode .darkmode:hover {
+            background: #ffffff;
+
+            color: rgb(0, 0, 0);
+        }
+
+        body.light-mode .display {
+            background: #ff006a91;
+            color: white;
+        }
+
+        body.light-mode .color {
+            background: #ffe75cb0;
+            color: rgb(0, 0, 0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <audio id="bgMusic" src="Assets/Ben Rector - Love Like This (official audio).mp3" loop></audio>
+    <!-- src="Gustixa - lemon tree.mp3" -->
+    <video autoplay muted loop id="bg-video">
+        <source src="Assets/darkmode.mp4" type="video/mp4">
+    </video>
+
+    <div class="container">
+        <div class="buttons-container">
+            <h1>Hexadecimal Calculator</h1>
+
+            <div class="buttons">
+                <button class="clear">Clear</button>
+                <button class="backspace">⌫</button>
+                <button id="playPause" class="play">♬</button>
+                <button class="darkmode">Light</button>
+
+                <button class="color">D</button>
+                <button class="color">E</button>
+                <button class="color">F</button>
+                <button class="equal">=</button>
+
+                <button class="color">A</button>
+                <button class="color">B</button>
+                <button class="color">C</button>
+                <button class="op">+</button>
+
+                <button>7</button>
+                <button>8</button>
+                <button>9</button>
+                <button class="op">−</button>
+
+                <button>4</button>
+                <button>5</button>
+                <button>6</button>
+                <button>0</button>
+
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <button id="toggleDisplay" class="display">Show</button>
+            </div>
+
+            <p>Lim and Audrey</p>
+        </div>
+        <div class="display-container hidden" id="displayPanel">
+            <div id="main-expression">0</div>
+
+            <div class="modes-container">
+                <div class="modes">
+                    <span>HEX</span>
+                </div>
+                <div class="values">
+                    <div id="val-hex">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById("main-expression");
+        const valHex = document.getElementById("val-hex");
+        const displayPanel = document.getElementById("displayPanel");
+
+        const bgMusic = document.getElementById("bgMusic");
+        const playPauseBtn = document.getElementById("playPause");
+        const darkModeBtn = document.querySelector(".darkmode");
+
+        const bgVideo = document.getElementById("bg-video");
+        const bgVideoSource = bgVideo.querySelector("source");
+
+        let expression = "0";
+        const OPERATORS = ["+", "−"];
+
+        /* ================= BUTTON HANDLING ================= */
+
+        document.querySelectorAll(".buttons button").forEach(button => {
+
+            // Exclude special control buttons
+            if (
+                button.id === "playPause" ||
+                button.id === "toggleDisplay" ||   // FIXED
+                button.classList.contains("darkmode")
+            ) return;
+
+            button.addEventListener("click", () => {
+                handleInput(button.textContent.trim());
+            });
+        });
+
+        function handleInput(value) {
+
+            if (expression === "Error") expression = "0";
+
+            if (value === "Clear") {
+                expression = "0";
+            }
+
+            else if (value === "⌫") {
+                expression = expression.length > 1
+                    ? expression.slice(0, -1)
+                    : "0";
+            }
+
+            else if (value === "=") {
+                calculateResult();
+                return;
+            }
+
+            else {
+                const lastChar = expression.slice(-1);
+
+                // Prevent double operators
+                if (OPERATORS.includes(value) && OPERATORS.includes(lastChar)) {
+                    expression = expression.slice(0, -1) + value;
+                }
+                else {
+                    expression = (expression === "0" && !OPERATORS.includes(value))
+                        ? value
+                        : expression + value;
+                }
+            }
+
+            updateDisplay();
+        }
+
+        /* ================= DISPLAY UPDATE ================= */
+
+        function updateDisplay() {
+            display.textContent = expression;
+
+            // Show decimal preview if valid HEX expression without operators
+            if (/^[0-9A-Fa-f]+$/.test(expression)) {
+                const decimalValue = parseInt(expression, 16);
+                valHex.textContent = decimalValue.toString(10); // FIXED
+            } else {
+                valHex.textContent = "—";
+            }
+        }
+
+        /* ================= CALCULATION ================= */
+
+        function calculateResult() {
+            try {
+                if (OPERATORS.includes(expression.slice(-1))) return;
+
+                // Replace custom minus symbol
+                let safe = expression.replace(/−/g, "-");
+
+                // Convert each HEX number to decimal
+                safe = safe.replace(/[0-9A-F]+/gi, match => {
+                    return parseInt(match, 16);
+                });
+
+                const result = Function('"use strict";return (' + safe + ')')();
+
+                if (!isFinite(result)) throw new Error();
+
+                // Convert result back to HEX
+                expression = Math.floor(result)
+                    .toString(16)
+                    .toUpperCase();
+
+                updateDisplay();
+
+            } catch {
+                expression = "Error";
+                display.textContent = "Error";
+                valHex.textContent = "—";
+            }
+        }
+
+        /* ================= DISPLAY TOGGLE ================= */
+
+        const toggleBtn = document.getElementById("toggleDisplay");
+
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = displayPanel.classList.toggle("hidden");
+            toggleBtn.textContent = isHidden ? "Show" : "Hide";
+        });
+
+        /* ================= MUSIC ================= */
+
+        playPauseBtn.textContent = "♬";
+
+        playPauseBtn.addEventListener("click", () => {
+            if (bgMusic.paused) {
+                bgMusic.play()
+                    .then(() => {
+                        playPauseBtn.textContent = "⏸";
+                    })
+                    .catch(error => {
+                        console.log("Playback prevented:", error);
+                    });
+            } else {
+                bgMusic.pause();
+                playPauseBtn.textContent = "♬";
+            }
+        });
+
+        /* ================= THEME ================= */
+
+        function applyTheme(theme) {
+            if (theme === "light") {
+                document.body.classList.add("light-mode");
+                darkModeBtn.textContent = "Dark";
+                bgVideoSource.src = "Assets/lightmode.mp4";
+            } else {
+                document.body.classList.remove("light-mode");
+                darkModeBtn.textContent = "Light";
+                bgVideoSource.src = "Assets/darkmode11.mp4";
+            }
+            bgVideo.load();
+        }
+
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        applyTheme(savedTheme);
+
+        darkModeBtn.addEventListener("click", () => {
+            const newTheme = document.body.classList.contains("light-mode")
+                ? "dark"
+                : "light";
+            applyTheme(newTheme);
+            localStorage.setItem("theme", newTheme);
+        });
+    </script>
+
+</body>
+
+</html>

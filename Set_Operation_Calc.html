@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Set Operation Calculator</title>
+
+<link rel="icon" href="icons8-calculator-48.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Schoolbell&family=Science+Gothic:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+box-sizing:border-box;
+font-family:"Science Gothic",sans-serif;
+}
+
+body{
+margin:0;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+background:#1a1a1a;
+overflow:hidden;
+}
+
+#bg-video{
+position:fixed;
+inset:0;
+width:100%;
+height:100%;
+object-fit:cover;
+z-index:-1;
+filter:brightness(.6);
+}
+
+.panel{
+width:700px;
+padding:40px;
+border-radius:30px;
+backdrop-filter:blur(12px);
+background:rgba(255,255,255,.05);
+box-shadow:0 30px 60px rgba(0,0,0,.7);
+border:1px solid rgba(255,255,255,.1);
+text-align:center;
+color:white;
+}
+
+h1{
+font-family:"Schoolbell";
+letter-spacing:3px;
+}
+
+input{
+width:90%;
+padding:10px;
+margin:10px;
+font-size:16px;
+border-radius:8px;
+border:none;
+}
+
+button{
+padding:12px 18px;
+margin:5px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#ffe75c;
+font-weight:bold;
+}
+
+button:hover{
+background:#a8ffa8;
+transform:translateY(-2px);
+}
+
+.result{
+margin-top:20px;
+font-size:18px;
+}
+
+.footer{
+margin-top:20px;
+font-family:"Schoolbell";
+letter-spacing:4px;
+}
+
+body.light-mode{
+background:white;
+}
+
+body.light-mode .panel{
+background:rgba(255,255,255,.3);
+color:black;
+}
+
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" src="Assets/Gustixa - lemon tree.mp3" loop></audio>
+
+<video autoplay muted loop id="bg-video">
+<source src="Assets/darkmode.mp4" type="video/mp4">
+</video>
+
+<div class="panel">
+
+<h1>Set Operation Calculator</h1>
+
+<input id="setA" placeholder="Enter Set A (example: 1,2,3)">
+<input id="setB" placeholder="Enter Set B (example: 2,3,4)">
+
+<br>
+
+<button onclick="union()">Union</button>
+<button onclick="intersection()">Intersection</button>
+<button onclick="difference()">A - B</button>
+<button onclick="toggleTheme()">Toggle Theme</button>
+
+<div class="result" id="result"></div>
+
+<div class="footer">Programmer Tools</div>
+
+</div>
+
+<script>
+
+function getSets(){
+
+let A=document.getElementById("setA").value.split(",").map(x=>x.trim());
+let B=document.getElementById("setB").value.split(",").map(x=>x.trim());
+
+return {A,B};
+}
+
+function union(){
+
+let {A,B}=getSets();
+
+let result=[...new Set([...A,...B])];
+
+document.getElementById("result").innerHTML="Union: { "+result.join(", ")+" }";
+}
+
+function intersection(){
+
+let {A,B}=getSets();
+
+let result=A.filter(x=>B.includes(x));
+
+document.getElementById("result").innerHTML="Intersection: { "+result.join(", ")+" }";
+}
+
+function difference(){
+
+let {A,B}=getSets();
+
+let result=A.filter(x=>!B.includes(x));
+
+document.getElementById("result").innerHTML="A − B: { "+result.join(", ")+" }";
+}
+
+function toggleTheme(){
+document.body.classList.toggle("light-mode");
+}
+
+</script>
+
+</body>
+</html>
