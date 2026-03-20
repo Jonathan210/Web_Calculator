@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Truth Table Calculator</title>
+
+    <link rel="icon" href="icons8-calculator-48.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Schoolbell&family=Science+Gothic:wght@300;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Science Gothic", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a1a;
+            overflow-x: hidden;
+        }
+
+        #bg-video {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: brightness(.6);
+        }
+
+        .panel {
+            width: 700px;
+            padding: 40px;
+            border-radius: 30px;
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, .05);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, .7);
+            border: 1px solid rgba(255, 255, 255, .1);
+            text-align: center;
+            color: white;
+            margin: 20px;
+        }
+
+        h1 {
+            font-family: "Schoolbell", cursive;
+            letter-spacing: 3px;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        input:focus {
+            outline: 2px solid #ffb6c1;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #ffb6c1;
+        }
+
+        button:hover {
+            background: #a8ffa8;
+            transform: translateY(-2px);
+        }
+
+        table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid white;
+            padding: 8px;
+        }
+
+        tr.row-false td {
+            opacity: 0.5;
+        }
+
+        tr.row-true td:last-child {
+            color: #a8ffa8;
+            font-weight: bold;
+        }
+
+        tr.row-false td:last-child {
+            color: #ff8888;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-family: "Schoolbell";
+            letter-spacing: 4px;
+        }
+
+        .error-msg {
+            color: #ff8888;
+            font-size: 14px;
+            margin: 4px 0 0 0;
+            min-height: 18px;
+        }
+
+        .hint {
+            font-size: 12px;
+            opacity: 0.6;
+            margin: 4px 0;
+        }
+
+        .history-label {
+            font-size: 13px;
+            opacity: 0.7;
+            margin-top: 8px;
+        }
+
+        #history-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin: 6px 0;
+        }
+
+        .history-chip {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-chip:hover {
+            background: rgba(255, 182, 193, 0.3);
+        }
+
+        #copy-btn {
+            display: none;
+        }
+
+        body.light-mode {
+            background: white;
+        }
+
+        body.light-mode .panel {
+            background: rgba(255, 255, 255, .3);
+            color: black;
+        }
+
+        body.light-mode table,
+        body.light-mode th,
+        body.light-mode td {
+            border: 1px solid black;
+        }
+
+        body.light-mode .history-chip {
+            background: rgba(0,0,0,0.07);
+            border-color: rgba(0,0,0,0.15);
+            color: black;
+        }
+
+        body.light-mode tr.row-true td:last-child {
+            color: #1a8a1a;
+        }
+
+        body.light-mode tr.row-false td:last-child {
+            color: #cc0000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <audio id="bgMusic" src="Assets/Gustixa - lemon tree.mp3" loop></audio>
+
+    <video autoplay muted loop id="bg-video">
+        <source src="Assets/darkmode.mp4" type="video/mp4">
+    </video>
+
+    <div class="panel">
+
+        <h1>Truth Table Generator</h1>
+
+        <input id="expression" placeholder="Example: A && B || !C" autocomplete="off" spellcheck="false">
+        <p class="hint">Supports: && (AND) &nbsp;|&nbsp; || (OR) &nbsp;|&nbsp; ! (NOT) &nbsp;|&nbsp; ^ (XOR) &nbsp;|&nbsp; Also: AND, OR, NOT, XOR</p>
+        <p class="error-msg" id="error-msg"></p>
+
+        <div id="history-section" style="display:none">
+            <div class="history-label">Recent:</div>
+            <div id="history-list"></div>
+        </div>
+
+        <br>
+
+        <button onclick="generateTable()">Generate Truth Table</button>
+        <button id="copy-btn" onclick="copyTable()">Copy Results</button>
+        <button onclick="toggleTheme()">Toggle Theme</button>
+        <button onclick="window.location.href='index.html'">Back</button>
+
+        <table id="table"></table>
+
+        <div class="footer">Programmer Tools</div>
+
+    </div>
+
+    <script>
+
+        // ── History ──────────────────────────────────────────
+        const MAX_HISTORY = 5;
+        let history = JSON.parse(sessionStorage.getItem("ttHistory") || "[]");
+
+        function saveHistory(exp) {
+            history = [exp, ...history.filter(e => e !== exp)].slice(0, MAX_HISTORY);
+            sessionStorage.setItem("ttHistory", JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const section = document.getElementById("history-section");
+            const list = document.getElementById("history-list");
+            list.innerHTML = "";
+            if (history.length === 0) { section.style.display = "none"; return; }
+            section.style.display = "block";
+            history.forEach(exp => {
+                const chip = document.createElement("span");
+                chip.className = "history-chip";
+                chip.textContent = exp;
+                chip.onclick = () => {
+                    document.getElementById("expression").value = exp;
+                    generateTable();
+                };
+                list.appendChild(chip);
+            });
+        }
+
+        renderHistory();
+
+        // ── Expression normalizer ─────────────────────────────
+        function normalizeExpression(exp) {
+            return exp
+                .replace(/\bXOR\b/gi, "^")
+                .replace(/\bAND\b/gi,  "&&")
+                .replace(/\bOR\b/gi,   "||")
+                .replace(/\bNOT\b/gi,  "!")
+                .replace(/\bTRUE\b/gi, "true")
+                .replace(/\bFALSE\b/gi,"false");
+        }
+
+        // ── Variable extractor ────────────────────────────────
+        function extractVariables(exp) {
+            const matches = exp.match(/\b[A-Z]\b/g);
+            if (!matches) return [];
+            return [...new Set(matches)].sort();
+        }
+
+        // ── Main generator ────────────────────────────────────
+        function generateTable() {
+            const rawExp = document.getElementById("expression").value.trim();
+            const errorEl = document.getElementById("error-msg");
+            const table = document.getElementById("table");
+            const copyBtn = document.getElementById("copy-btn");
+
+            table.innerHTML = "";
+            errorEl.textContent = "";
+            copyBtn.style.display = "none";
+
+            if (!rawExp) {
+                errorEl.textContent = "Please enter a logical expression.";
+                return;
+            }
+
+            const exp = normalizeExpression(rawExp);
+            const vars = extractVariables(exp);
+
+            if (vars.length === 0) {
+                errorEl.textContent = "No variables (A–Z) found in expression.";
+                return;
+            }
+
+            if (vars.length > 6) {
+                errorEl.textContent = "Too many variables (max 6) — table would be too large.";
+                return;
+            }
+
+            // Build header
+            const headerCells = vars.map(v => `<th>${v}</th>`).join("") + `<th>${rawExp}</th>`;
+            table.innerHTML = `<tr>${headerCells}</tr>`;
+
+            // Generate all combinations (2^n rows)
+            const rowCount = 1 << vars.length;
+            let hasError = false;
+
+            for (let i = 0; i < rowCount; i++) {
+                const assignments = {};
+                vars.forEach((v, idx) => {
+                    assignments[v] = Boolean(i & (1 << (vars.length - 1 - idx)));
+                });
+
+                const scopeVars = vars.map(v => `var ${v} = ${assignments[v]};`).join(" ");
+
+                // Replace ^ with XOR function to avoid bitwise issues on booleans
+                const safeExp = exp.replace(/\^/g, "!==");
+
+                let result;
+                try {
+                    result = new Function(`${scopeVars} return !!(${safeExp});`)();
+                } catch (e) {
+                    result = "Error";
+                    hasError = true;
+                }
+
+                const valueCells = vars.map(v => `<td>${assignments[v]}</td>`).join("");
+                const rowClass = result === true ? "row-true" : result === false ? "row-false" : "";
+                table.innerHTML += `<tr class="${rowClass}">${valueCells}<td>${result}</td></tr>`;
+            }
+
+            if (hasError) {
+                errorEl.textContent = "Some rows couldn't be evaluated — check your expression syntax.";
+            } else {
+                saveHistory(rawExp);
+                copyBtn.style.display = "inline-block";
+            }
+        }
+
+        // ── Copy table to clipboard ───────────────────────────
+        function copyTable() {
+            const rows = document.querySelectorAll("#table tr");
+            if (!rows.length) return;
+            const lines = [...rows].map(tr =>
+                [...tr.querySelectorAll("th,td")].map(c => c.textContent.padEnd(10)).join(" | ")
+            );
+            navigator.clipboard.writeText(lines.join("\n")).then(() => {
+                const btn = document.getElementById("copy-btn");
+                const prev = btn.textContent;
+                btn.textContent = "Copied!";
+                setTimeout(() => btn.textContent = prev, 1500);
+            });
+        }
+
+        // ── Theme toggle ─────────────────────────────────────
+        function toggleTheme() {
+            document.body.classList.toggle("light-mode");
+        }
+
+        // ── Enter key support ─────────────────────────────────
+        document.getElementById("expression").addEventListener("keydown", e => {
+            if (e.key === "Enter") generateTable();
+        });
+
+    </script>
+
+</body>
+
+</html>
