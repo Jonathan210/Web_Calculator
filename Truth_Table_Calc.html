@@ -3,713 +3,539 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Truth Table Calculator</title>
-    <link rel="icon" href="Assets/icons8-calculator-48.png" type="image/x-icon" />
-    <link href="https://fonts.googleapis.com/css2?family=Schoolbell&family=Science+Gothic:wght@300;500;700&display=swap"
-        rel="stylesheet">
-
+    <link rel="icon" href="icons8-calculator-48.png">
+    <link href="https://fonts.googleapis.com/css2?family=Schoolbell&family=Science+Gothic:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: "Science Gothic", sans-serif;
-        }
-
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            background: #1a1a1a;
-            overflow-x: hidden;
-            padding: 20px 0 40px;
-        }
-
-        #bg-video {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
-            filter: brightness(.6);
-        }
-
-        .panel {
-            width: 700px;
-            padding: 40px;
-            border-radius: 30px;
-            backdrop-filter: blur(12px);
-            background: rgba(255, 255, 255, .05);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, .7);
-            border: 1px solid rgba(255, 255, 255, .1);
-            text-align: center;
-            color: white;
-            margin: 20px;
-        }
-
-        h1 {
-            font-family: "Schoolbell", cursive;
-            letter-spacing: 3px;
-            margin-bottom: 8px;
-        }
-
-        /* ── Back button ──────────────────────────────── */
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            text-decoration: none;
-            color: rgba(255, 255, 255, .55);
-            font-size: 13px;
-            letter-spacing: .5px;
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, .12);
-            background: rgba(255, 255, 255, .05);
-            transition: color .15s, background .15s, border-color .15s;
-            margin-bottom: 18px;
-        }
-
-        .back-btn:hover {
-            color: white;
-            background: rgba(255, 255, 255, .1);
-            border-color: rgba(255, 255, 255, .25);
-        }
-
-        .back-btn svg {
-            width: 14px;
-            height: 14px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        /* ── Input area ───────────────────────────────── */
-        .input-wrapper {
-            position: relative;
-            margin: 14px auto 0;
-            width: 90%;
-        }
-
-        #expression {
-            width: 100%;
-            padding: 13px 50px 13px 16px;
-            font-size: 17px;
-            font-family: "Courier New", monospace;
-            border-radius: 12px;
-            border: 2px solid rgba(255, 255, 255, .2);
-            background: rgba(255, 255, 255, .08);
-            color: white;
-            transition: border-color .2s, background .2s;
-            letter-spacing: .5px;
-        }
-
-        #expression::placeholder {
-            color: rgba(255, 255, 255, .35);
-            font-size: 14px;
-        }
-
-        #expression:focus {
-            outline: none;
-            border-color: #ffb6c1;
-            background: rgba(255, 255, 255, .12);
-        }
-
-        /* ── Live preview ─────────────────────────────── */
-        #live-preview {
-            margin: 8px auto 0;
-            width: 90%;
-            min-height: 28px;
-            font-size: 13px;
-            text-align: left;
-            transition: all .2s;
-        }
-
-        .preview-vars {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .preview-label {
-            color: rgba(255, 255, 255, .5);
-            font-size: 12px;
-        }
-
-        .var-badge {
-            background: rgba(168, 255, 168, .15);
-            border: 1px solid rgba(168, 255, 168, .3);
-            color: #a8ffa8;
-            border-radius: 6px;
-            padding: 2px 9px;
-            font-size: 13px;
-            font-family: "Courier New", monospace;
-            font-weight: bold;
-        }
-
-        .row-count {
-            color: rgba(255, 255, 255, .45);
-            font-size: 12px;
-            margin-left: 4px;
-        }
-
-        .preview-error {
-            color: #ff8888;
-            font-size: 13px;
-        }
-
-        .preview-ready {
-            color: rgba(168, 255, 168, .7);
-            font-size: 13px;
-        }
-
-        /* ── Operator buttons ─────────────────────────── */
-        .ops-label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, .4);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin: 18px 0 7px;
-        }
-
-        .ops-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 7px;
-            margin-bottom: 4px;
-        }
-
-        .op-btn {
-            background: rgba(255, 255, 255, .08);
-            border: 1px solid rgba(255, 255, 255, .18);
-            border-radius: 8px;
-            color: white;
-            font-size: 13px;
-            padding: 5px 13px;
-            cursor: pointer;
-            transition: background .15s, border-color .15s, transform .1s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        .op-btn:hover {
-            background: rgba(255, 182, 193, .2);
-            border-color: #ffb6c1;
-            transform: translateY(-1px);
-        }
-
-        .op-btn:active {
-            transform: scale(.97);
-        }
-
-        .op-symbol {
-            font-family: "Courier New", monospace;
-            font-size: 14px;
-            color: #ffb6c1;
-            font-weight: bold;
-        }
-
-        .op-name {
-            color: rgba(255, 255, 255, .6);
-            font-size: 11px;
-        }
-
-        /* ── Variable quick-insert ────────────────────── */
-        .var-label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, .4);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin: 14px 0 7px;
-        }
-
-        .var-btns {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .var-btn {
-            background: rgba(168, 255, 168, .1);
-            border: 1px solid rgba(168, 255, 168, .25);
-            border-radius: 8px;
-            color: #a8ffa8;
-            font-family: "Courier New", monospace;
-            font-size: 14px;
-            font-weight: bold;
-            padding: 4px 13px;
-            cursor: pointer;
-            transition: background .15s, transform .1s;
-        }
-
-        .var-btn:hover {
-            background: rgba(168, 255, 168, .2);
-            transform: translateY(-1px);
-        }
-
-        .var-btn:active {
-            transform: scale(.97);
-        }
-
-        .var-btn.used {
-            background: rgba(168, 255, 168, .25);
-            border-color: rgba(168, 255, 168, .5);
-        }
-
-        /* ── Separator ────────────────────────────────── */
-        .divider {
-            border: none;
-            border-top: 1px solid rgba(255, 255, 255, .08);
-            margin: 20px 0;
-        }
-
-        /* ── Examples ─────────────────────────────────── */
-        .examples-label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, .4);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin: 20px 0 8px;
-        }
-
-        .examples-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 7px;
-        }
-
-        .example-chip {
-            background: rgba(255, 255, 255, .07);
-            border: 1px solid rgba(255, 255, 255, .15);
-            border-radius: 20px;
-            padding: 4px 14px;
-            font-size: 12px;
-            font-family: "Courier New", monospace;
-            cursor: pointer;
-            color: rgba(255, 255, 255, .7);
-            transition: background .15s, color .15s;
-        }
-
-        .example-chip:hover {
-            background: rgba(255, 182, 193, .2);
-            color: white;
-            border-color: #ffb6c1;
-        }
-
-        /* ── History button + dropdown ────────────────── */
-        .history-btn {
-            background: rgba(255, 255, 255, .08);
-            border: 1px solid rgba(255, 255, 255, .18);
-            border-radius: 8px;
-            color: rgba(255, 255, 255, .7);
-            font-size: 13px;
-            padding: 5px 14px;
-            cursor: pointer;
-            font-family: "Science Gothic", sans-serif;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background .15s, border-color .15s, color .15s;
-            margin-top: 14px;
-        }
-
-        .history-btn:hover {
-            background: rgba(255, 182, 193, .2);
-            border-color: #ffb6c1;
-            color: white;
-        }
-
-        .history-btn .hb-arrow {
-            display: inline-block;
-            transition: transform .25s;
-            font-size: 10px;
-            opacity: .6;
-        }
-
-        .history-btn.open .hb-arrow {
-            transform: rotate(180deg);
-        }
-
-        #history-dropdown {
-            display: none;
-            margin: 10px auto 0;
-            width: 90%;
-            background: rgba(255, 255, 255, .07);
-            border: 1px solid rgba(255, 255, 255, .12);
-            border-radius: 14px;
-            padding: 14px 16px;
-            text-align: left;
-            animation: dropIn .2s ease;
-        }
-
-        #history-dropdown.visible {
-            display: block;
-        }
-
-        @keyframes dropIn {
-            from {
-                opacity: 0;
-                transform: translateY(-6px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .history-dropdown-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .history-dropdown-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255, 255, 255, .4);
-        }
-
-        .history-clear-all {
-            font-size: 11px;
-            color: rgba(255, 100, 100, .6);
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-family: "Science Gothic", sans-serif;
-            padding: 0;
-            transition: color .15s;
-        }
-
-        .history-clear-all:hover {
-            color: rgba(255, 100, 100, 1);
-        }
-
-        .history-empty {
-            font-size: 13px;
-            color: rgba(255, 255, 255, .3);
-            text-align: center;
-            padding: 6px 0;
-        }
-
-        #history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .history-chip {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(255, 255, 255, .1);
-            border-radius: 8px;
-            padding: 7px 12px;
-            cursor: pointer;
-            transition: background .15s, border-color .15s;
-            gap: 10px;
-        }
-
-        .history-chip:hover {
-            background: rgba(255, 182, 193, .15);
-            border-color: rgba(255, 182, 193, .3);
-        }
-
-        .history-chip-expr {
-            font-family: "Courier New", monospace;
-            font-size: 13px;
-            color: white;
-            flex: 1;
-        }
-
-        .history-chip-load {
-            font-size: 11px;
-            color: rgba(255, 182, 193, .7);
-            white-space: nowrap;
-        }
-
-        .history-chip:hover .history-chip-load {
-            color: #ffb6c1;
-        }
-
-        /* ── Error ────────────────────────────────────── */
-        .error-msg {
-            color: #ff8888;
-            font-size: 13px;
-            margin: 10px 0 0;
-            min-height: 18px;
-        }
-
-        /* ── Action buttons ───────────────────────────── */
-        .action-row {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        button.action {
-            padding: 12px 22px;
-            font-size: 15px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            background: #ffb6c1;
-            transition: background .15s, transform .15s;
-            font-family: "Science Gothic", sans-serif;
-        }
-
-        button.action:hover {
-            background: #a8ffa8;
-            transform: translateY(-2px);
-        }
-
-        button.action:active {
-            transform: scale(.97);
-        }
-
-        #copy-btn {
-            display: none;
-        }
-
-        /* ── Table ────────────────────────────────────── */
-        table {
-            margin-top: 24px;
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            border: 1px solid rgba(255, 255, 255, .2);
-            padding: 8px 12px;
-            font-family: "Courier New", monospace;
-        }
-
-        th {
-            background: rgba(255, 255, 255, .07);
-            font-family: "Science Gothic", sans-serif;
-            font-size: 13px;
-            letter-spacing: .5px;
-        }
-
-        tr.row-false td {
-            opacity: 0.5;
-        }
-
-        tr.row-true td:last-child {
-            color: #a8ffa8;
-            font-weight: bold;
-        }
-
-        tr.row-false td:last-child {
-            color: #ff8888;
-        }
-
-        /* ── Footer ───────────────────────────────────── */
-        .footer {
-            margin-top: 24px;
-            font-family: "Schoolbell";
-            letter-spacing: 4px;
-            opacity: .5;
-            font-size: 13px;
-        }
-
-        /* ── Light mode ───────────────────────────────── */
-        body.light-mode {
-            background: white;
-        }
-
-        body.light-mode .panel {
-            background: rgba(255, 255, 255, .35);
-            color: #111;
-        }
-
-        body.light-mode .back-btn {
-            color: rgba(0, 0, 0, .45);
-            border-color: rgba(0, 0, 0, .12);
-            background: rgba(0, 0, 0, .04);
-        }
-
-        body.light-mode .back-btn:hover {
-            color: #111;
-            background: rgba(0, 0, 0, .08);
-            border-color: rgba(0, 0, 0, .2);
-        }
-
-        body.light-mode #expression {
-            background: rgba(0, 0, 0, .04);
-            color: #111;
-            border-color: rgba(0, 0, 0, .2);
-        }
-
-        body.light-mode #expression::placeholder {
-            color: rgba(0, 0, 0, .35);
-        }
-
-        body.light-mode #expression:focus {
-            border-color: #e07a8a;
-        }
-
-        body.light-mode .preview-label {
-            color: rgba(0, 0, 0, .4);
-        }
-
-        body.light-mode .row-count {
-            color: rgba(0, 0, 0, .4);
-        }
-
-        body.light-mode .var-badge {
-            background: rgba(20, 140, 20, .1);
-            border-color: rgba(20, 140, 20, .3);
-            color: #1a8a1a;
-        }
-
-        body.light-mode .op-btn {
-            background: rgba(0, 0, 0, .05);
-            border-color: rgba(0, 0, 0, .15);
-            color: #111;
-        }
-
-        body.light-mode .op-btn:hover {
-            background: rgba(220, 100, 120, .1);
-            border-color: #e07a8a;
-        }
-
-        body.light-mode .op-symbol {
-            color: #e07a8a;
-        }
-
-        body.light-mode .op-name {
-            color: rgba(0, 0, 0, .5);
-        }
-
-        body.light-mode .var-btn {
-            background: rgba(20, 140, 20, .08);
-            border-color: rgba(20, 140, 20, .2);
-            color: #1a8a1a;
-        }
-
-        body.light-mode .var-btn:hover {
-            background: rgba(20, 140, 20, .18);
-        }
-
-        body.light-mode .var-btn.used {
-            background: rgba(20, 140, 20, .2);
-        }
-
-        body.light-mode .divider {
-            border-color: rgba(0, 0, 0, .1);
-        }
-
-        body.light-mode .ops-label,
-        body.light-mode .var-label,
-        body.light-mode .examples-label {
-            color: rgba(0, 0, 0, .4);
-        }
-
-        body.light-mode .example-chip {
-            background: rgba(0, 0, 0, .05);
-            border-color: rgba(0, 0, 0, .12);
-            color: rgba(0, 0, 0, .6);
-        }
-
-        body.light-mode .example-chip:hover {
-            background: rgba(220, 100, 120, .1);
-            color: #111;
-            border-color: #e07a8a;
-        }
-
-        body.light-mode .history-btn {
-            background: rgba(0, 0, 0, .05);
-            border-color: rgba(0, 0, 0, .15);
-            color: rgba(0, 0, 0, .6);
-        }
-
-        body.light-mode .history-btn:hover {
-            background: rgba(220, 100, 120, .1);
-            border-color: #e07a8a;
-            color: #111;
-        }
-
-        body.light-mode #history-dropdown {
-            background: rgba(0, 0, 0, .04);
-            border-color: rgba(0, 0, 0, .1);
-        }
-
-        body.light-mode .history-dropdown-title {
-            color: rgba(0, 0, 0, .4);
-        }
-
-        body.light-mode .history-chip {
-            background: rgba(0, 0, 0, .04);
-            border-color: rgba(0, 0, 0, .1);
-        }
-
-        body.light-mode .history-chip:hover {
-            background: rgba(220, 100, 120, .1);
-            border-color: #e07a8a;
-        }
-
-        body.light-mode .history-chip-expr {
-            color: #111;
-        }
-
-        body.light-mode .history-chip-load {
-            color: rgba(220, 100, 120, .7);
-        }
-
-        body.light-mode .history-chip:hover .history-chip-load {
-            color: #e07a8a;
-        }
-
-        body.light-mode .history-empty {
-            color: rgba(0, 0, 0, .3);
-        }
-
-        body.light-mode th,
-        body.light-mode td {
-            border-color: rgba(0, 0, 0, .2);
-        }
-
-        body.light-mode th {
-            background: rgba(0, 0, 0, .04);
-        }
-
-        body.light-mode tr.row-true td:last-child {
-            color: #1a8a1a;
-        }
-
-        body.light-mode tr.row-false td:last-child {
-            color: #cc0000;
-        }
+        /* ── Base / reset ─────────────────────────────────────── */
+* {
+    box-sizing: border-box;
+    font-family: "Science Gothic", sans-serif;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background: #1a1a1a;
+    overflow-x: hidden;
+    padding: 16px 0 40px;
+}
+
+#bg-video {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    filter: brightness(.6);
+}
+
+/* ── Panel ────────────────────────────────────────────── */
+.panel {
+    width: 100%;
+    max-width: 700px;
+    padding: 24px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,.05);
+    box-shadow: 0 20px 50px rgba(0,0,0,.7);
+    border: 1px solid rgba(255,255,255,.1);
+    text-align: center;
+    color: white;
+    margin: 12px 16px;
+}
+
+h1 {
+    font-family: "Schoolbell", cursive;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+}
+
+/* ── Back button ──────────────────────────────────────── */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: rgba(255,255,255,.55);
+    font-size: 13px;
+    letter-spacing: .5px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.05);
+    transition: color .15s, background .15s, border-color .15s;
+    margin-bottom: 16px;
+}
+.back-btn:hover { color: white; background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.25); }
+.back-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+/* ── Input area ───────────────────────────────────────── */
+.input-wrapper {
+    position: relative;
+    margin: 14px auto 0;
+    width: 100%;
+}
+
+#expression {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: clamp(14px, 4vw, 17px);
+    font-family: "Courier New", monospace;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.08);
+    color: white;
+    transition: border-color .2s, background .2s;
+    letter-spacing: .5px;
+}
+#expression::placeholder { color: rgba(255,255,255,.35); font-size: clamp(12px, 3.5vw, 14px); }
+#expression:focus { outline: none; border-color: #ffb6c1; background: rgba(255,255,255,.12); }
+
+/* ── Live preview ─────────────────────────────────────── */
+#live-preview {
+    margin: 8px auto 0;
+    width: 100%;
+    min-height: 26px;
+    font-size: 13px;
+    text-align: left;
+    transition: all .2s;
+}
+
+.preview-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.preview-label { color: rgba(255,255,255,.5); font-size: 12px; }
+
+.var-badge {
+    background: rgba(168,255,168,.15);
+    border: 1px solid rgba(168,255,168,.3);
+    color: #a8ffa8;
+    border-radius: 6px;
+    padding: 2px 9px;
+    font-size: 13px;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+}
+
+.row-count { color: rgba(255,255,255,.45); font-size: 12px; margin-left: 4px; }
+.preview-error { color: #ff8888; font-size: 13px; }
+.preview-ready  { color: rgba(168,255,168,.7); font-size: 13px; }
+
+/* ── Operator buttons ─────────────────────────────────── */
+.ops-label,
+.var-label,
+.examples-label {
+    font-size: 11px;
+    color: rgba(255,255,255,.4);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 16px 0 7px;
+}
+
+.ops-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.op-btn {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 8px;
+    color: white;
+    font-size: 13px;
+    padding: 7px 12px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, transform .1s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    /* make tap targets comfortably sized on mobile */
+    min-height: 36px;
+}
+.op-btn:hover  { background: rgba(255,182,193,.2); border-color: #ffb6c1; transform: translateY(-1px); }
+.op-btn:active { transform: scale(.97); }
+
+.op-symbol { font-family: "Courier New", monospace; font-size: 14px; color: #ffb6c1; font-weight: bold; }
+.op-name   { color: rgba(255,255,255,.6); font-size: 11px; }
+
+/* ── Variable quick-insert ────────────────────────────── */
+.var-btns {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.var-btn {
+    background: rgba(168,255,168,.1);
+    border: 1px solid rgba(168,255,168,.25);
+    border-radius: 8px;
+    color: #a8ffa8;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+    min-height: 36px;
+}
+.var-btn:hover  { background: rgba(168,255,168,.2); transform: translateY(-1px); }
+.var-btn:active { transform: scale(.97); }
+.var-btn.used   { background: rgba(168,255,168,.25); border-color: rgba(168,255,168,.5); }
+
+/* ── Separator ────────────────────────────────────────── */
+.divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,.08);
+    margin: 18px 0;
+}
+
+/* ── Examples ─────────────────────────────────────────── */
+.examples-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+}
+
+.example-chip {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 12px;
+    font-family: "Courier New", monospace;
+    cursor: pointer;
+    color: rgba(255,255,255,.7);
+    transition: background .15s, color .15s;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+}
+.example-chip:hover { background: rgba(255,182,193,.2); color: white; border-color: #ffb6c1; }
+
+/* ── History button + dropdown ────────────────────────── */
+.history-btn {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 8px;
+    color: rgba(255,255,255,.7);
+    font-size: 13px;
+    padding: 7px 14px;
+    cursor: pointer;
+    font-family: "Science Gothic", sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .15s, border-color .15s, color .15s;
+    margin-top: 14px;
+    min-height: 36px;
+}
+.history-btn:hover { background: rgba(255,182,193,.2); border-color: #ffb6c1; color: white; }
+
+.history-btn .hb-arrow {
+    display: inline-block;
+    transition: transform .25s;
+    font-size: 10px;
+    opacity: .6;
+}
+.history-btn.open .hb-arrow { transform: rotate(180deg); }
+
+#history-dropdown {
+    display: none;
+    margin: 10px auto 0;
+    width: 100%;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 14px;
+    padding: 14px 16px;
+    text-align: left;
+    animation: dropIn .2s ease;
+}
+#history-dropdown.visible { display: block; }
+
+@keyframes dropIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.history-dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.history-dropdown-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,.4);
+}
+
+.history-clear-all {
+    font-size: 11px;
+    color: rgba(255,100,100,.6);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: "Science Gothic", sans-serif;
+    padding: 0;
+    transition: color .15s;
+    min-height: 32px;
+}
+.history-clear-all:hover { color: rgba(255,100,100,1); }
+
+.history-empty {
+    font-size: 13px;
+    color: rgba(255,255,255,.3);
+    text-align: center;
+    padding: 6px 0;
+}
+
+#history-list { display: flex; flex-direction: column; gap: 6px; }
+
+.history-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    gap: 10px;
+    min-height: 40px;
+}
+.history-chip:hover { background: rgba(255,182,193,.15); border-color: rgba(255,182,193,.3); }
+
+.history-chip-expr {
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    color: white;
+    flex: 1;
+    word-break: break-all;
+}
+
+.history-chip-load { font-size: 11px; color: rgba(255,182,193,.7); white-space: nowrap; }
+.history-chip:hover .history-chip-load { color: #ffb6c1; }
+
+/* ── Error ────────────────────────────────────────────── */
+.error-msg {
+    color: #ff8888;
+    font-size: 13px;
+    margin: 10px 0 0;
+    min-height: 18px;
+}
+
+/* ── Action buttons ───────────────────────────────────── */
+.action-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+button.action {
+    padding: 11px 18px;
+    font-size: 14px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: #ffb6c1;
+    transition: background .15s, transform .15s;
+    font-family: "Science Gothic", sans-serif;
+    min-height: 44px;
+    white-space: nowrap;
+}
+button.action:hover  { background: #a8ffa8; transform: translateY(-2px); }
+button.action:active { transform: scale(.97); }
+
+#copy-btn { display: none; }
+
+/* ── Table ────────────────────────────────────────────── */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 24px;
+    border-radius: 10px;
+}
+
+table {
+    width: 100%;
+    min-width: 280px;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid rgba(255,255,255,.2);
+    padding: 8px 12px;
+    font-family: "Courier New", monospace;
+    font-size: clamp(11px, 2.5vw, 14px);
+    white-space: nowrap;
+}
+th {
+    background: rgba(255,255,255,.07);
+    font-family: "Science Gothic", sans-serif;
+    font-size: clamp(11px, 2.5vw, 13px);
+    letter-spacing: .5px;
+}
+
+tr.row-false td          { opacity: 0.5; }
+tr.row-true  td:last-child { color: #a8ffa8; font-weight: bold; }
+tr.row-false td:last-child { color: #ff8888; }
+
+/* ── Footer ───────────────────────────────────────────── */
+.footer { margin-top: 24px; font-family: "Schoolbell"; letter-spacing: 4px; opacity: .5; font-size: 13px; }
+
+
+/* ════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ════════════════════════════════════════════════════════ */
+
+/* ── Small phones (≤ 360px) ───────────────────────────── */
+@media (max-width: 360px) {
+    .panel { padding: 18px 14px; margin: 8px 10px; border-radius: 16px; }
+
+    h1 { font-size: 1.3rem; letter-spacing: 1px; }
+
+    #expression { font-size: 13px; padding: 10px 12px; }
+
+    .op-btn { padding: 6px 9px; font-size: 12px; gap: 4px; }
+    .op-name { display: none; } /* hide "AND/OR/NOT" labels, keep symbols only */
+
+    .var-btn { padding: 5px 10px; font-size: 13px; }
+
+    button.action { padding: 10px 13px; font-size: 13px; }
+
+    th, td { padding: 6px 8px; }
+}
+
+/* ── Phones (361px – 480px) ───────────────────────────── */
+@media (min-width: 361px) and (max-width: 480px) {
+    .panel { padding: 20px 16px; margin: 10px 12px; border-radius: 18px; }
+
+    .op-name { font-size: 10px; }
+
+    button.action { padding: 11px 16px; font-size: 14px; }
+}
+
+/* ── Tablets (481px – 768px) ──────────────────────────── */
+@media (min-width: 481px) and (max-width: 768px) {
+    .panel { padding: 28px 24px; margin: 14px 16px; border-radius: 22px; }
+
+    button.action { padding: 11px 20px; }
+}
+
+/* ── Desktop (≥ 769px) ────────────────────────────────── */
+@media (min-width: 769px) {
+    .panel { padding: 40px; border-radius: 30px; margin: 20px; }
+
+    .input-wrapper { width: 90%; }
+    #live-preview  { width: 90%; }
+
+    h1 { font-size: 2rem; letter-spacing: 3px; }
+
+    #expression { padding: 13px 16px; font-size: 17px; }
+
+    button.action { padding: 12px 22px; font-size: 15px; }
+
+    .op-btn { padding: 5px 13px; }
+    .var-btn { padding: 4px 13px; }
+}
+
+/* ── Touch devices: remove hover transforms ───────────── */
+@media (hover: none) {
+    .op-btn:hover,
+    .var-btn:hover,
+    .example-chip:hover,
+    .history-btn:hover,
+    button.action:hover { transform: none; }
+}
+
+
+/* ════════════════════════════════════════════════════════
+   LIGHT MODE
+   ════════════════════════════════════════════════════════ */
+body.light-mode { background: white; }
+body.light-mode .panel { background: rgba(255,255,255,.35); color: #111; }
+
+body.light-mode .back-btn { color: rgba(0,0,0,.45); border-color: rgba(0,0,0,.12); background: rgba(0,0,0,.04); }
+body.light-mode .back-btn:hover { color: #111; background: rgba(0,0,0,.08); border-color: rgba(0,0,0,.2); }
+
+body.light-mode #expression { background: rgba(0,0,0,.04); color: #111; border-color: rgba(0,0,0,.2); }
+body.light-mode #expression::placeholder { color: rgba(0,0,0,.35); }
+body.light-mode #expression:focus { border-color: #e07a8a; }
+
+body.light-mode .preview-label { color: rgba(0,0,0,.4); }
+body.light-mode .row-count     { color: rgba(0,0,0,.4); }
+body.light-mode .var-badge     { background: rgba(20,140,20,.1); border-color: rgba(20,140,20,.3); color: #1a8a1a; }
+
+body.light-mode .op-btn       { background: rgba(0,0,0,.05); border-color: rgba(0,0,0,.15); color: #111; }
+body.light-mode .op-btn:hover { background: rgba(220,100,120,.1); border-color: #e07a8a; }
+body.light-mode .op-symbol    { color: #e07a8a; }
+body.light-mode .op-name      { color: rgba(0,0,0,.5); }
+
+body.light-mode .var-btn      { background: rgba(20,140,20,.08); border-color: rgba(20,140,20,.2); color: #1a8a1a; }
+body.light-mode .var-btn:hover { background: rgba(20,140,20,.18); }
+body.light-mode .var-btn.used  { background: rgba(20,140,20,.2); }
+
+body.light-mode .divider { border-color: rgba(0,0,0,.1); }
+
+body.light-mode .ops-label,
+body.light-mode .var-label,
+body.light-mode .examples-label { color: rgba(0,0,0,.4); }
+
+body.light-mode .example-chip       { background: rgba(0,0,0,.05); border-color: rgba(0,0,0,.12); color: rgba(0,0,0,.6); }
+body.light-mode .example-chip:hover { background: rgba(220,100,120,.1); color: #111; border-color: #e07a8a; }
+
+body.light-mode .history-btn        { background: rgba(0,0,0,.05); border-color: rgba(0,0,0,.15); color: rgba(0,0,0,.6); }
+body.light-mode .history-btn:hover  { background: rgba(220,100,120,.1); border-color: #e07a8a; color: #111; }
+body.light-mode #history-dropdown   { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); }
+body.light-mode .history-dropdown-title { color: rgba(0,0,0,.4); }
+body.light-mode .history-chip       { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); }
+body.light-mode .history-chip:hover { background: rgba(220,100,120,.1); border-color: #e07a8a; }
+body.light-mode .history-chip-expr  { color: #111; }
+body.light-mode .history-chip-load  { color: rgba(220,100,120,.7); }
+body.light-mode .history-chip:hover .history-chip-load { color: #e07a8a; }
+body.light-mode .history-empty      { color: rgba(0,0,0,.3); }
+
+body.light-mode th,
+body.light-mode td { border-color: rgba(0,0,0,.2); }
+body.light-mode th { background: rgba(0,0,0,.04); }
+body.light-mode tr.row-true  td:last-child { color: #1a8a1a; }
+body.light-mode tr.row-false td:last-child { color: #cc0000; }
     </style>
 </head>
 
 <body>
     <audio id="bgMusic" src="Assets/Gustixa - lemon tree.mp3" loop></audio>
     <video autoplay muted loop id="bg-video">
-        <source src="Assets/darkmode11.mp4" type="video/mp4">
+        <source src="Assets/darkmode.mp4" type="video/mp4">
     </video>
 
     <div class="panel">
         <a href="index.html" class="back-btn">
-            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="10 4 6 8 10 12" />
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="10 4 6 8 10 12"/>
             </svg>
             Back
         </a>
@@ -727,18 +553,12 @@
         <!-- Operator insert buttons -->
         <div class="ops-label">Insert operator</div>
         <div class="ops-grid">
-            <button class="op-btn" onclick="insertOp(' && ')"><span class="op-symbol">&amp;&amp;</span><span
-                    class="op-name">AND</span></button>
-            <button class="op-btn" onclick="insertOp(' || ')"><span class="op-symbol">||</span><span
-                    class="op-name">OR</span></button>
-            <button class="op-btn" onclick="insertOp('!')"><span class="op-symbol">!</span><span
-                    class="op-name">NOT</span></button>
-            <button class="op-btn" onclick="insertOp(' ^ ')"><span class="op-symbol">^</span><span
-                    class="op-name">XOR</span></button>
-            <button class="op-btn" onclick="insertOp('(')"><span class="op-symbol">(</span><span
-                    class="op-name">open</span></button>
-            <button class="op-btn" onclick="insertOp(')')"><span class="op-symbol">)</span><span
-                    class="op-name">close</span></button>
+            <button class="op-btn" onclick="insertOp(' && ')"><span class="op-symbol">&amp;&amp;</span><span class="op-name">AND</span></button>
+            <button class="op-btn" onclick="insertOp(' || ')"><span class="op-symbol">||</span><span class="op-name">OR</span></button>
+            <button class="op-btn" onclick="insertOp('!')"><span class="op-symbol">!</span><span class="op-name">NOT</span></button>
+            <button class="op-btn" onclick="insertOp(' ^ ')"><span class="op-symbol">^</span><span class="op-name">XOR</span></button>
+            <button class="op-btn" onclick="insertOp('(')"><span class="op-symbol">(</span><span class="op-name">open</span></button>
+            <button class="op-btn" onclick="insertOp(')')"><span class="op-symbol">)</span><span class="op-name">close</span></button>
         </div>
 
         <!-- Variable buttons -->
@@ -763,8 +583,7 @@
             <span class="example-chip" onclick="loadExample('A ^ B')">A ^ B</span>
             <span class="example-chip" onclick="loadExample('A && (B || C)')">A &amp;&amp; (B || C)</span>
             <span class="example-chip" onclick="loadExample('!(A && B)')">!(A &amp;&amp; B)</span>
-            <span class="example-chip" onclick="loadExample('(A || B) && !(A && B)')">(A || B) &amp;&amp; !(A &amp;&amp;
-                B)</span>
+            <span class="example-chip" onclick="loadExample('(A || B) && !(A && B)')">(A || B) &amp;&amp; !(A &amp;&amp; B)</span>
         </div>
 
         <!-- History button + dropdown -->
@@ -792,237 +611,239 @@
             <button class="action" onclick="toggleTheme()">Toggle Theme</button>
         </div>
 
-        <table id="table"></table>
+        <div class="table-wrapper">
+            <table id="table"></table>
+        </div>
         <div class="footer">Programmer Tools</div>
     </div>
 
     <script>
         // ── History ────────────────────────────────────────────
-        const MAX_HISTORY = 5;
-        let history = JSON.parse(sessionStorage.getItem("ttHistory") || "[]");
+const MAX_HISTORY = 5;
+let history = JSON.parse(sessionStorage.getItem("ttHistory") || "[]");
 
-        function saveHistory(exp) {
-            history = [exp, ...history.filter(e => e !== exp)].slice(0, MAX_HISTORY);
-            sessionStorage.setItem("ttHistory", JSON.stringify(history));
-            renderHistory();
-        }
+function saveHistory(exp) {
+    history = [exp, ...history.filter(e => e !== exp)].slice(0, MAX_HISTORY);
+    sessionStorage.setItem("ttHistory", JSON.stringify(history));
+    renderHistory();
+}
 
-        function renderHistory() {
-            const list = document.getElementById("history-list");
-            list.innerHTML = "";
-            if (!history.length) {
-                list.innerHTML = '<div class="history-empty">No history yet</div>';
-                return;
-            }
-            history.forEach(exp => {
-                const chip = document.createElement("div");
-                chip.className = "history-chip";
-                chip.innerHTML = `<span class="history-chip-expr">${exp.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</span><span class="history-chip-load">Load ↗</span>`;
-                chip.onclick = () => {
-                    document.getElementById("expression").value = exp;
-                    generateTable();
-                    updateLivePreview();
-                    closeHistoryDropdown();
-                };
-                list.appendChild(chip);
-            });
-        }
-
-        function toggleHistoryDropdown() {
-            const btn = document.getElementById("history-btn");
-            const drop = document.getElementById("history-dropdown");
-            const isOpen = drop.classList.contains("visible");
-            if (isOpen) {
-                drop.classList.remove("visible");
-                btn.classList.remove("open");
-            } else {
-                renderHistory();
-                drop.classList.add("visible");
-                btn.classList.add("open");
-            }
-        }
-
-        function closeHistoryDropdown() {
-            document.getElementById("history-dropdown").classList.remove("visible");
-            document.getElementById("history-btn").classList.remove("open");
-        }
-
-        function clearAllHistory() {
-            history = [];
-            sessionStorage.removeItem("ttHistory");
-            renderHistory();
-        }
-
-        renderHistory();
-
-        // ── Expression helpers ─────────────────────────────────
-        function normalizeExpression(exp) {
-            return exp
-                .replace(/\bXOR\b/gi, "^")
-                .replace(/\bAND\b/gi, "&&")
-                .replace(/\bOR\b/gi, "||")
-                .replace(/\bNOT\b/gi, "!")
-                .replace(/\bTRUE\b/gi, "true")
-                .replace(/\bFALSE\b/gi, "false");
-        }
-
-        function extractVariables(exp) {
-            const matches = exp.match(/\b[A-Z]\b/g);
-            if (!matches) return [];
-            return [...new Set(matches)].sort();
-        }
-
-        // ── Operator / variable insert ─────────────────────────
-        function insertOp(op) {
-            const inp = document.getElementById("expression");
-            inp.focus();
-            const s = inp.selectionStart, e = inp.selectionEnd;
-            const v = inp.value;
-            inp.value = v.slice(0, s) + op + v.slice(e);
-            const pos = s + op.length;
-            inp.setSelectionRange(pos, pos);
-            updateLivePreview();
-        }
-
-        function clearInput() {
-            const inp = document.getElementById("expression");
-            inp.value = "";
-            inp.focus();
-            updateLivePreview();
-            document.getElementById("table").innerHTML = "";
-            document.getElementById("error-msg").textContent = "";
-            document.getElementById("copy-btn").style.display = "none";
-            document.getElementById("clear-btn").style.display = "none";
-        }
-
-        function loadExample(exp) {
+function renderHistory() {
+    const list = document.getElementById("history-list");
+    list.innerHTML = "";
+    if (!history.length) {
+        list.innerHTML = '<div class="history-empty">No history yet</div>';
+        return;
+    }
+    history.forEach(exp => {
+        const chip = document.createElement("div");
+        chip.className = "history-chip";
+        chip.innerHTML = `<span class="history-chip-expr">${exp.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</span><span class="history-chip-load">Load ↗</span>`;
+        chip.onclick = () => {
             document.getElementById("expression").value = exp;
-            updateLivePreview();
             generateTable();
-        }
+            updateLivePreview();
+            closeHistoryDropdown();
+        };
+        list.appendChild(chip);
+    });
+}
 
-        // ── Live preview ───────────────────────────────────────
-        function updateLivePreview() {
-            const raw = document.getElementById("expression").value.trim();
-            const preview = document.getElementById("live-preview");
-            const varBtns = document.querySelectorAll(".var-btn");
+function toggleHistoryDropdown() {
+    const btn = document.getElementById("history-btn");
+    const drop = document.getElementById("history-dropdown");
+    const isOpen = drop.classList.contains("visible");
+    if (isOpen) {
+        drop.classList.remove("visible");
+        btn.classList.remove("open");
+    } else {
+        renderHistory();
+        drop.classList.add("visible");
+        btn.classList.add("open");
+    }
+}
 
-            if (!raw) {
-                preview.innerHTML = "";
-                varBtns.forEach(b => b.classList.remove("used"));
-                return;
-            }
+function closeHistoryDropdown() {
+    document.getElementById("history-dropdown").classList.remove("visible");
+    document.getElementById("history-btn").classList.remove("open");
+}
 
-            const exp = normalizeExpression(raw);
-            const vars = extractVariables(exp);
+function clearAllHistory() {
+    history = [];
+    sessionStorage.removeItem("ttHistory");
+    renderHistory();
+}
 
-            varBtns.forEach(b => {
-                b.classList.toggle("used", vars.includes(b.textContent.trim()));
-            });
+renderHistory();
 
-            if (vars.length === 0) {
-                preview.innerHTML = `<span class="preview-error">No variables found — use capital letters like A, B, C</span>`;
-                return;
-            }
+// ── Expression helpers ─────────────────────────────────
+function normalizeExpression(exp) {
+    return exp
+        .replace(/\bXOR\b/gi,  "^")
+        .replace(/\bAND\b/gi,  "&&")
+        .replace(/\bOR\b/gi,   "||")
+        .replace(/\bNOT\b/gi,  "!")
+        .replace(/\bTRUE\b/gi, "true")
+        .replace(/\bFALSE\b/gi,"false");
+}
 
-            if (vars.length > 6) {
-                preview.innerHTML = `<span class="preview-error">Too many variables (max 6)</span>`;
-                return;
-            }
+function extractVariables(exp) {
+    const matches = exp.match(/\b[A-Z]\b/g);
+    if (!matches) return [];
+    return [...new Set(matches)].sort();
+}
 
-            const rows = 1 << vars.length;
+// ── Operator / variable insert ─────────────────────────
+function insertOp(op) {
+    const inp = document.getElementById("expression");
+    inp.focus();
+    const s = inp.selectionStart, e = inp.selectionEnd;
+    const v = inp.value;
+    inp.value = v.slice(0, s) + op + v.slice(e);
+    const pos = s + op.length;
+    inp.setSelectionRange(pos, pos);
+    updateLivePreview();
+}
 
-            const safeExp = exp.replace(/\^/g, "!==");
-            const testScope = vars.map(v => `var ${v} = true;`).join(" ");
-            let syntaxOk = true;
-            try { new Function(`${testScope} return !!(${safeExp});`)(); } catch (e) { syntaxOk = false; }
+function clearInput() {
+    const inp = document.getElementById("expression");
+    inp.value = "";
+    inp.focus();
+    updateLivePreview();
+    document.getElementById("table").innerHTML = "";
+    document.getElementById("error-msg").textContent = "";
+    document.getElementById("copy-btn").style.display = "none";
+    document.getElementById("clear-btn").style.display = "none";
+}
 
-            if (!syntaxOk) {
-                preview.innerHTML = `<span class="preview-error">Syntax issue — check operators and parentheses</span>`;
-                return;
-            }
+function loadExample(exp) {
+    document.getElementById("expression").value = exp;
+    updateLivePreview();
+    generateTable();
+}
 
-            const varBadges = vars.map(v => `<span class="var-badge">${v}</span>`).join("");
-            preview.innerHTML = `<div class="preview-vars">
+// ── Live preview ───────────────────────────────────────
+function updateLivePreview() {
+    const raw = document.getElementById("expression").value.trim();
+    const preview = document.getElementById("live-preview");
+    const varBtns = document.querySelectorAll(".var-btn");
+
+    if (!raw) {
+        preview.innerHTML = "";
+        varBtns.forEach(b => b.classList.remove("used"));
+        return;
+    }
+
+    const exp = normalizeExpression(raw);
+    const vars = extractVariables(exp);
+
+    varBtns.forEach(b => {
+        b.classList.toggle("used", vars.includes(b.textContent.trim()));
+    });
+
+    if (vars.length === 0) {
+        preview.innerHTML = `<span class="preview-error">No variables found — use capital letters like A, B, C</span>`;
+        return;
+    }
+
+    if (vars.length > 6) {
+        preview.innerHTML = `<span class="preview-error">Too many variables (max 6)</span>`;
+        return;
+    }
+
+    const rows = 1 << vars.length;
+
+    const safeExp = exp.replace(/\^/g, "!==");
+    const testScope = vars.map(v => `var ${v} = true;`).join(" ");
+    let syntaxOk = true;
+    try { new Function(`${testScope} return !!(${safeExp});`)(); } catch(e) { syntaxOk = false; }
+
+    if (!syntaxOk) {
+        preview.innerHTML = `<span class="preview-error">Syntax issue — check operators and parentheses</span>`;
+        return;
+    }
+
+    const varBadges = vars.map(v => `<span class="var-badge">${v}</span>`).join("");
+    preview.innerHTML = `<div class="preview-vars">
         <span class="preview-label">Variables:</span> ${varBadges}
         <span class="row-count">→ ${rows} row${rows !== 1 ? "s" : ""}</span>
     </div>`;
-        }
+}
 
-        // ── Main generator ─────────────────────────────────────
-        function generateTable() {
-            const rawExp = document.getElementById("expression").value.trim();
-            const errorEl = document.getElementById("error-msg");
-            const table = document.getElementById("table");
-            const copyBtn = document.getElementById("copy-btn");
+// ── Main generator ─────────────────────────────────────
+function generateTable() {
+    const rawExp = document.getElementById("expression").value.trim();
+    const errorEl = document.getElementById("error-msg");
+    const table = document.getElementById("table");
+    const copyBtn = document.getElementById("copy-btn");
 
-            table.innerHTML = "";
-            errorEl.textContent = "";
-            copyBtn.style.display = "none";
+    table.innerHTML = "";
+    errorEl.textContent = "";
+    copyBtn.style.display = "none";
 
-            if (!rawExp) { errorEl.textContent = "Please enter a logical expression."; return; }
+    if (!rawExp) { errorEl.textContent = "Please enter a logical expression."; return; }
 
-            const exp = normalizeExpression(rawExp);
-            const vars = extractVariables(exp);
+    const exp = normalizeExpression(rawExp);
+    const vars = extractVariables(exp);
 
-            if (vars.length === 0) { errorEl.textContent = "No variables (A–Z) found. Use capital letters."; return; }
-            if (vars.length > 6) { errorEl.textContent = "Too many variables (max 6)."; return; }
+    if (vars.length === 0) { errorEl.textContent = "No variables (A–Z) found. Use capital letters."; return; }
+    if (vars.length > 6)   { errorEl.textContent = "Too many variables (max 6)."; return; }
 
-            const headerCells = vars.map(v => `<th>${v}</th>`).join("") + `<th>${rawExp}</th>`;
-            table.innerHTML = `<tr>${headerCells}</tr>`;
+    const headerCells = vars.map(v => `<th>${v}</th>`).join("") + `<th>${rawExp}</th>`;
+    table.innerHTML = `<tr>${headerCells}</tr>`;
 
-            const rowCount = 1 << vars.length;
-            let hasError = false;
+    const rowCount = 1 << vars.length;
+    let hasError = false;
 
-            for (let i = 0; i < rowCount; i++) {
-                const assignments = {};
-                vars.forEach((v, idx) => { assignments[v] = Boolean(i & (1 << (vars.length - 1 - idx))); });
+    for (let i = 0; i < rowCount; i++) {
+        const assignments = {};
+        vars.forEach((v, idx) => { assignments[v] = Boolean(i & (1 << (vars.length - 1 - idx))); });
 
-                const scopeVars = vars.map(v => `var ${v} = ${assignments[v]};`).join(" ");
-                const safeExp = exp.replace(/\^/g, "!==");
+        const scopeVars = vars.map(v => `var ${v} = ${assignments[v]};`).join(" ");
+        const safeExp = exp.replace(/\^/g, "!==");
 
-                let result;
-                try { result = new Function(`${scopeVars} return !!(${safeExp});`)(); }
-                catch (e) { result = "Error"; hasError = true; }
+        let result;
+        try { result = new Function(`${scopeVars} return !!(${safeExp});`)(); }
+        catch(e) { result = "Error"; hasError = true; }
 
-                const valueCells = vars.map(v => `<td>${assignments[v]}</td>`).join("");
-                const rowClass = result === true ? "row-true" : result === false ? "row-false" : "";
-                table.innerHTML += `<tr class="${rowClass}">${valueCells}<td>${result}</td></tr>`;
-            }
+        const valueCells = vars.map(v => `<td>${assignments[v]}</td>`).join("");
+        const rowClass = result === true ? "row-true" : result === false ? "row-false" : "";
+        table.innerHTML += `<tr class="${rowClass}">${valueCells}<td>${result}</td></tr>`;
+    }
 
-            if (hasError) {
-                errorEl.textContent = "Some rows couldn't be evaluated — check your expression syntax.";
-            } else {
-                saveHistory(rawExp);
-                copyBtn.style.display = "inline-block";
-                document.getElementById("clear-btn").style.display = "inline-block";
-            }
-        }
+    if (hasError) {
+        errorEl.textContent = "Some rows couldn't be evaluated — check your expression syntax.";
+    } else {
+        saveHistory(rawExp);
+        copyBtn.style.display = "inline-block";
+        document.getElementById("clear-btn").style.display = "inline-block";
+    }
+}
 
-        // ── Copy table ─────────────────────────────────────────
-        function copyTable() {
-            const rows = document.querySelectorAll("#table tr");
-            if (!rows.length) return;
-            const lines = [...rows].map(tr =>
-                [...tr.querySelectorAll("th,td")].map(c => c.textContent.padEnd(10)).join(" | ")
-            );
-            navigator.clipboard.writeText(lines.join("\n")).then(() => {
-                const btn = document.getElementById("copy-btn");
-                const prev = btn.textContent;
-                btn.textContent = "Copied!";
-                setTimeout(() => btn.textContent = prev, 1500);
-            });
-        }
+// ── Copy table ─────────────────────────────────────────
+function copyTable() {
+    const rows = document.querySelectorAll("#table tr");
+    if (!rows.length) return;
+    const lines = [...rows].map(tr =>
+        [...tr.querySelectorAll("th,td")].map(c => c.textContent.padEnd(10)).join(" | ")
+    );
+    navigator.clipboard.writeText(lines.join("\n")).then(() => {
+        const btn = document.getElementById("copy-btn");
+        const prev = btn.textContent;
+        btn.textContent = "Copied!";
+        setTimeout(() => btn.textContent = prev, 1500);
+    });
+}
 
-        // ── Theme toggle ───────────────────────────────────────
-        function toggleTheme() { document.body.classList.toggle("light-mode"); }
+// ── Theme toggle ───────────────────────────────────────
+function toggleTheme() { document.body.classList.toggle("light-mode"); }
 
-        // ── Event listeners ────────────────────────────────────
-        document.getElementById("expression").addEventListener("keydown", e => {
-            if (e.key === "Enter") generateTable();
-        });
+// ── Event listeners ────────────────────────────────────
+document.getElementById("expression").addEventListener("keydown", e => {
+    if (e.key === "Enter") generateTable();
+});
 
-        document.getElementById("expression").addEventListener("input", updateLivePreview);
+document.getElementById("expression").addEventListener("input", updateLivePreview);
     </script>
 </body>
 
