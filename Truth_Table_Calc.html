@@ -914,17 +914,17 @@ function generateTable() {
             type = "tautology";
             icon = "✅";
             label = "Tautology";
-            desc = "Always TRUE for every possible input";
+            
         } else if (allFalse) {
             type = "contradiction";
             icon = "❌";
             label = "Contradiction";
-            desc = "Always FALSE for every possible input";
+            
         } else {
             type = "contingency";
             icon = "🔀";
             label = "Contingency";
-            desc = "Sometimes TRUE, sometimes FALSE";
+            
         }
 
         classEl.style.display = "block";
