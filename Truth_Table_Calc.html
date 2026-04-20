@@ -614,6 +614,8 @@ body.light-mode .class-badge.contingency  { background: rgba(100,60,200,.08); bo
             <button class="op-btn" onclick="insertOp(' || ')"><span class="op-symbol">||</span><span class="op-name">OR</span></button>
             <button class="op-btn" onclick="insertOp('!')"><span class="op-symbol">!</span><span class="op-name">NOT</span></button>
             <button class="op-btn" onclick="insertOp(' ^ ')"><span class="op-symbol">^</span><span class="op-name">XOR</span></button>
+            <button class="op-btn" onclick="insertOp(' -> ')"><span class="op-symbol">→</span><span class="op-name">IMPLIES</span></button>
+            <button class="op-btn" onclick="insertOp(' <-> ')"><span class="op-symbol">↔</span><span class="op-name">IFF</span></button>
             <button class="op-btn" onclick="insertOp('(')"><span class="op-symbol">(</span><span class="op-name">open</span></button>
             <button class="op-btn" onclick="insertOp(')')"><span class="op-symbol">)</span><span class="op-name">close</span></button>
             <button class="op-btn" onclick="backspaceOp()"><span class="op-symbol">⌫</span><span class="op-name">del</span></button>
@@ -645,6 +647,8 @@ body.light-mode .class-badge.contingency  { background: rgba(100,60,200,.08); bo
             <span class="example-chip" onclick="loadExample('(P && Q) || !P || !Q')">(P &amp;&amp; Q) || !P || !Q</span>
             <span class="example-chip" onclick="loadExample('!P || P')">!P || P</span>
             <span class="example-chip" onclick="loadExample('P && !P')">P &amp;&amp; !P</span>
+            <span class="example-chip" onclick="loadExample('P -> Q')">P → Q</span>
+            <span class="example-chip" onclick="loadExample('P <-> Q')">P ↔ Q</span>
         </div>
 
         <!-- History button + dropdown -->
@@ -746,7 +750,23 @@ function normalizeExpression(exp) {
         .replace(/\bOR\b/gi,   "||")
         .replace(/\bNOT\b/gi,  "!")
         .replace(/\bTRUE\b/gi, "true")
-        .replace(/\bFALSE\b/gi,"false");
+        .replace(/\bFALSE\b/gi,"false")
+        .replace(/<->/g,       "___IFF___")
+        .replace(/->/g,        "___IMP___");
+}
+
+function prepareForEval(exp) {
+    // IFF (↔): A <-> B  =>  __iff(A, B) — but we can't restructure binary trees easily,
+    // so we replace the operator token with JS === for booleans: (A) === (B)
+    // IMP (→): A -> B  =>  !A || B. We handle left-operand via a trick:
+    // replace ___IMP___ with || and prepend ! to left — too complex for arbitrary nesting.
+    // Instead inject helper functions and replace operators with function-call syntax is hard.
+    // Cleanest approach: replace token with JS operators that match the truth table:
+    //   A -> B  = !A || B  => in JS booleans: A <= B  (false<=true=true, true<=false=false, etc.) ✓
+    //   A <-> B = A === B  => works perfectly for booleans ✓
+    return exp
+        .replace(/___IFF___/g, "===")
+        .replace(/___IMP___/g, "<=");
 }
 
 function extractVariables(exp) {
@@ -831,7 +851,7 @@ function updateLivePreview() {
 
     const rows = 1 << vars.length;
 
-    const safeExp = exp.replace(/\^/g, "!==");
+    const safeExp = prepareForEval(exp.replace(/\^/g, "!=="));
     const testScope = vars.map(v => `var ${v} = true;`).join(" ");
     let syntaxOk = true;
     try { new Function(`${testScope} return !!(${safeExp});`)(); } catch(e) { syntaxOk = false; }
@@ -878,7 +898,7 @@ function generateTable() {
         vars.forEach((v, idx) => { assignments[v] = Boolean(i & (1 << (vars.length - 1 - idx))); });
 
         const scopeVars = vars.map(v => `var ${v} = ${assignments[v]};`).join(" ");
-        const safeExp = exp.replace(/\^/g, "!==");
+        const safeExp = prepareForEval(exp.replace(/\^/g, "!=="));
 
         let result;
         try { result = new Function(`${scopeVars} return !!(${safeExp});`)(); }
@@ -902,7 +922,7 @@ function generateTable() {
             const assignments = {};
             vars.forEach((v, idx) => { assignments[v] = Boolean(i & (1 << (vars.length - 1 - idx))); });
             const scopeVars = vars.map(v => `var ${v} = ${assignments[v]};`).join(" ");
-            const safeExp2 = exp.replace(/\^/g, "!==");
+            const safeExp2 = prepareForEval(exp.replace(/\^/g, "!=="));
             try { results.push(new Function(`${scopeVars} return !!(${safeExp2});`)()); } catch(e) {}
         }
 
