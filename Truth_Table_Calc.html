@@ -523,6 +523,63 @@ body.light-mode td { border-color: rgba(0,0,0,.2); }
 body.light-mode th { background: rgba(0,0,0,.04); }
 body.light-mode tr.row-true  td:last-child { color: #1a8a1a; }
 body.light-mode tr.row-false td:last-child { color: #cc0000; }
+
+/* ── Classification badge ─────────────────────────────── */
+#classification {
+    margin-top: 20px;
+    display: none;
+    animation: fadeInUp .35s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.class-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-size: clamp(14px, 3.5vw, 18px);
+    font-family: "Science Gothic", sans-serif;
+    letter-spacing: 1px;
+    font-weight: bold;
+    border: 2px solid;
+}
+
+.class-badge.tautology {
+    background: rgba(100, 200, 100, .15);
+    border-color: rgba(100, 220, 100, .5);
+    color: #a8ffa8;
+}
+
+.class-badge.contradiction {
+    background: rgba(255, 100, 100, .12);
+    border-color: rgba(255, 120, 120, .45);
+    color: #ff9999;
+}
+
+.class-badge.contingency {
+    background: rgba(180, 160, 255, .12);
+    border-color: rgba(180, 160, 255, .4);
+    color: #c8b8ff;
+}
+
+.class-icon { font-size: 1.3em; }
+
+.class-desc {
+    font-size: clamp(11px, 2.5vw, 13px);
+    font-weight: normal;
+    opacity: .75;
+    letter-spacing: .3px;
+}
+
+/* light mode overrides */
+body.light-mode .class-badge.tautology    { background: rgba(20,140,20,.1); border-color: rgba(20,140,20,.4); color: #1a8a1a; }
+body.light-mode .class-badge.contradiction { background: rgba(200,0,0,.08); border-color: rgba(200,0,0,.35); color: #cc0000; }
+body.light-mode .class-badge.contingency  { background: rgba(100,60,200,.08); border-color: rgba(100,60,200,.3); color: #5533cc; }
     </style>
 </head>
 
@@ -544,7 +601,7 @@ body.light-mode tr.row-false td:last-child { color: #cc0000; }
 
         <!-- Input -->
         <div class="input-wrapper">
-            <input id="expression" placeholder="e.g. A && B || !C" autocomplete="off" spellcheck="false">
+            <input id="expression" placeholder="e.g. P && Q || !R" autocomplete="off" spellcheck="false">
         </div>
 
         <!-- Live preview -->
@@ -559,17 +616,17 @@ body.light-mode tr.row-false td:last-child { color: #cc0000; }
             <button class="op-btn" onclick="insertOp(' ^ ')"><span class="op-symbol">^</span><span class="op-name">XOR</span></button>
             <button class="op-btn" onclick="insertOp('(')"><span class="op-symbol">(</span><span class="op-name">open</span></button>
             <button class="op-btn" onclick="insertOp(')')"><span class="op-symbol">)</span><span class="op-name">close</span></button>
+            <button class="op-btn" onclick="backspaceOp()"><span class="op-symbol">⌫</span><span class="op-name"></span></button>
         </div>
 
         <!-- Variable buttons -->
         <div class="var-label">Insert variable</div>
         <div class="var-btns" id="var-btns">
-            <button class="var-btn" onclick="insertOp('A')">A</button>
-            <button class="var-btn" onclick="insertOp('B')">B</button>
-            <button class="var-btn" onclick="insertOp('C')">C</button>
-            <button class="var-btn" onclick="insertOp('D')">D</button>
-            <button class="var-btn" onclick="insertOp('E')">E</button>
-            <button class="var-btn" onclick="insertOp('F')">F</button>
+            <button class="var-btn" onclick="insertOp('P')">P</button>
+            <button class="var-btn" onclick="insertOp('Q')">Q</button>
+            <button class="var-btn" onclick="insertOp('R')">R</button>
+            <button class="var-btn" onclick="insertOp('S')">S</button>
+            <button class="var-btn" onclick="insertOp('T')">T</button>
         </div>
 
         <hr class="divider">
@@ -577,13 +634,16 @@ body.light-mode tr.row-false td:last-child { color: #cc0000; }
         <!-- Examples -->
         <div class="examples-label">Try an example</div>
         <div class="examples-row">
-            <span class="example-chip" onclick="loadExample('A && B')">A &amp;&amp; B</span>
-            <span class="example-chip" onclick="loadExample('A || B')">A || B</span>
-            <span class="example-chip" onclick="loadExample('!A')">!A</span>
-            <span class="example-chip" onclick="loadExample('A ^ B')">A ^ B</span>
-            <span class="example-chip" onclick="loadExample('A && (B || C)')">A &amp;&amp; (B || C)</span>
-            <span class="example-chip" onclick="loadExample('!(A && B)')">!(A &amp;&amp; B)</span>
-            <span class="example-chip" onclick="loadExample('(A || B) && !(A && B)')">(A || B) &amp;&amp; !(A &amp;&amp; B)</span>
+            <span class="example-chip" onclick="loadExample('P && Q')">P &amp;&amp; Q</span>
+            <span class="example-chip" onclick="loadExample('P || Q')">P || Q</span>
+            <span class="example-chip" onclick="loadExample('!P')">!P</span>
+            <span class="example-chip" onclick="loadExample('P ^ Q')">P ^ Q</span>
+            <span class="example-chip" onclick="loadExample('P && (Q || R)')">P &amp;&amp; (Q || R)</span>
+            <span class="example-chip" onclick="loadExample('!(P && Q)')">!(P &amp;&amp; Q)</span>
+            <span class="example-chip" onclick="loadExample('(P || Q) && !(P && Q)')">(P || Q) &amp;&amp; !(P &amp;&amp; Q)</span>
+            <span class="example-chip" onclick="loadExample('P || !P')">P || !P</span>
+            <span class="example-chip" onclick="loadExample('(P && Q) || !P || !Q')">(P &amp;&amp; Q) || !P || !Q</span>
+            <span class="example-chip" onclick="loadExample('!P || P')">!P || P</span>
         </div>
 
         <!-- History button + dropdown -->
@@ -614,6 +674,7 @@ body.light-mode tr.row-false td:last-child { color: #cc0000; }
         <div class="table-wrapper">
             <table id="table"></table>
         </div>
+        <div id="classification"></div>
         <div class="footer">Programmer Tools</div>
     </div>
 
@@ -688,7 +749,7 @@ function normalizeExpression(exp) {
 }
 
 function extractVariables(exp) {
-    const matches = exp.match(/\b[A-Z]\b/g);
+    const matches = exp.match(/\b[PQRST]\b/g);
     if (!matches) return [];
     return [...new Set(matches)].sort();
 }
@@ -705,6 +766,20 @@ function insertOp(op) {
     updateLivePreview();
 }
 
+function backspaceOp() {
+    const inp = document.getElementById("expression");
+    inp.focus();
+    const s = inp.selectionStart, e = inp.selectionEnd;
+    if (s === e && s > 0) {
+        inp.value = inp.value.slice(0, s - 1) + inp.value.slice(s);
+        inp.setSelectionRange(s - 1, s - 1);
+    } else if (s !== e) {
+        inp.value = inp.value.slice(0, s) + inp.value.slice(e);
+        inp.setSelectionRange(s, s);
+    }
+    updateLivePreview();
+}
+
 function clearInput() {
     const inp = document.getElementById("expression");
     inp.value = "";
@@ -714,6 +789,8 @@ function clearInput() {
     document.getElementById("error-msg").textContent = "";
     document.getElementById("copy-btn").style.display = "none";
     document.getElementById("clear-btn").style.display = "none";
+    document.getElementById("classification").style.display = "none";
+    document.getElementById("classification").innerHTML = "";
 }
 
 function loadExample(exp) {
@@ -742,7 +819,7 @@ function updateLivePreview() {
     });
 
     if (vars.length === 0) {
-        preview.innerHTML = `<span class="preview-error">No variables found — use capital letters like A, B, C</span>`;
+        preview.innerHTML = `<span class="preview-error">No variables found — use capital letters like P, Q, R</span>`;
         return;
     }
 
@@ -786,7 +863,7 @@ function generateTable() {
     const exp = normalizeExpression(rawExp);
     const vars = extractVariables(exp);
 
-    if (vars.length === 0) { errorEl.textContent = "No variables (A–Z) found. Use capital letters."; return; }
+    if (vars.length === 0) { errorEl.textContent = "No variables (P–T) found. Use capital letters."; return; }
     if (vars.length > 6)   { errorEl.textContent = "Too many variables (max 6)."; return; }
 
     const headerCells = vars.map(v => `<th>${v}</th>`).join("") + `<th>${rawExp}</th>`;
@@ -817,6 +894,48 @@ function generateTable() {
         saveHistory(rawExp);
         copyBtn.style.display = "inline-block";
         document.getElementById("clear-btn").style.display = "inline-block";
+
+        // ── Classify the expression ──────────────────────────
+        const results = [];
+        for (let i = 0; i < rowCount; i++) {
+            const assignments = {};
+            vars.forEach((v, idx) => { assignments[v] = Boolean(i & (1 << (vars.length - 1 - idx))); });
+            const scopeVars = vars.map(v => `var ${v} = ${assignments[v]};`).join(" ");
+            const safeExp2 = exp.replace(/\^/g, "!==");
+            try { results.push(new Function(`${scopeVars} return !!(${safeExp2});`)()); } catch(e) {}
+        }
+
+        const allTrue  = results.every(r => r === true);
+        const allFalse = results.every(r => r === false);
+        const classEl  = document.getElementById("classification");
+
+        let type, icon, label, desc;
+        if (allTrue) {
+            type = "tautology";
+            icon = "✅";
+            label = "Tautology";
+            desc = "Always TRUE for every possible input";
+        } else if (allFalse) {
+            type = "contradiction";
+            icon = "❌";
+            label = "Contradiction";
+            desc = "Always FALSE for every possible input";
+        } else {
+            type = "contingency";
+            icon = "🔀";
+            label = "Contingency";
+            desc = "Sometimes TRUE, sometimes FALSE";
+        }
+
+        classEl.style.display = "block";
+        classEl.innerHTML = `
+            <div class="class-badge ${type}">
+                <span class="class-icon">${icon}</span>
+                <div>
+                    <div>${label}</div>
+                    <div class="class-desc">${desc}</div>
+                </div>
+            </div>`;
     }
 }
 
