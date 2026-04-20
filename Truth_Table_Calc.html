@@ -616,7 +616,7 @@ body.light-mode .class-badge.contingency  { background: rgba(100,60,200,.08); bo
             <button class="op-btn" onclick="insertOp(' ^ ')"><span class="op-symbol">^</span><span class="op-name">XOR</span></button>
             <button class="op-btn" onclick="insertOp('(')"><span class="op-symbol">(</span><span class="op-name">open</span></button>
             <button class="op-btn" onclick="insertOp(')')"><span class="op-symbol">)</span><span class="op-name">close</span></button>
-            <button class="op-btn" onclick="backspaceOp()"><span class="op-symbol">⌫</span><span class="op-name"></span></button>
+            <button class="op-btn" onclick="backspaceOp()"><span class="op-symbol">⌫</span><span class="op-name">del</span></button>
         </div>
 
         <!-- Variable buttons -->
@@ -644,6 +644,7 @@ body.light-mode .class-badge.contingency  { background: rgba(100,60,200,.08); bo
             <span class="example-chip" onclick="loadExample('P || !P')">P || !P</span>
             <span class="example-chip" onclick="loadExample('(P && Q) || !P || !Q')">(P &amp;&amp; Q) || !P || !Q</span>
             <span class="example-chip" onclick="loadExample('!P || P')">!P || P</span>
+            <span class="example-chip" onclick="loadExample('P && !P')">P &amp;&amp; !P</span>
         </div>
 
         <!-- History button + dropdown -->
@@ -914,17 +915,17 @@ function generateTable() {
             type = "tautology";
             icon = "✅";
             label = "Tautology";
-            
+            desc = "Always TRUE for every possible input";
         } else if (allFalse) {
             type = "contradiction";
             icon = "❌";
             label = "Contradiction";
-            
+            desc = "Always FALSE for every possible input";
         } else {
             type = "contingency";
             icon = "🔀";
             label = "Contingency";
-            
+            desc = "Sometimes TRUE, sometimes FALSE";
         }
 
         classEl.style.display = "block";
