@@ -612,7 +612,7 @@ body.light-mode .class-badge.contingency  { background: rgba(100,60,200,.08); bo
         <div class="ops-grid">
             <button class="op-btn" onclick="insertOp(' && ')"><span class="op-symbol">&amp;&amp;</span><span class="op-name">AND</span></button>
             <button class="op-btn" onclick="insertOp(' || ')"><span class="op-symbol">||</span><span class="op-name">OR</span></button>
-            <button class="op-btn" onclick="insertOp('!')"><span class="op-symbol">!</span><span class="op-name">NOT</span></button>
+            <button class="op-btn" onclick="insertOp('¬')"><span class="op-symbol">!</span><span class="op-name">NOT</span></button>
             <button class="op-btn" onclick="insertOp(' ^ ')"><span class="op-symbol">^</span><span class="op-name">XOR</span></button>
             <button class="op-btn" onclick="insertOp(' -> ')"><span class="op-symbol">→</span><span class="op-name">IMPLIES</span></button>
             <button class="op-btn" onclick="insertOp(' <-> ')"><span class="op-symbol">↔</span><span class="op-name">IFF</span></button>
@@ -638,15 +638,15 @@ body.light-mode .class-badge.contingency  { background: rgba(100,60,200,.08); bo
         <div class="examples-row">
             <span class="example-chip" onclick="loadExample('P && Q')">P &amp;&amp; Q</span>
             <span class="example-chip" onclick="loadExample('P || Q')">P || Q</span>
-            <span class="example-chip" onclick="loadExample('!P')">!P</span>
+            <span class="example-chip" onclick="loadExample('¬P')">!P</span>
             <span class="example-chip" onclick="loadExample('P ^ Q')">P ^ Q</span>
             <span class="example-chip" onclick="loadExample('P && (Q || R)')">P &amp;&amp; (Q || R)</span>
-            <span class="example-chip" onclick="loadExample('!(P && Q)')">!(P &amp;&amp; Q)</span>
-            <span class="example-chip" onclick="loadExample('(P || Q) && !(P && Q)')">(P || Q) &amp;&amp; !(P &amp;&amp; Q)</span>
+            <span class="example-chip" onclick="loadExample('¬(P && Q)')">¬(P &amp;&amp; Q)</span>
+            <span class="example-chip" onclick="loadExample('(P || Q) && ¬(P && Q)')">(P || Q) &amp;&amp; !(P &amp;&amp; Q)</span>
             <span class="example-chip" onclick="loadExample('P || !P')">P || !P</span>
-            <span class="example-chip" onclick="loadExample('(P && Q) || !P || !Q')">(P &amp;&amp; Q) || !P || !Q</span>
-            <span class="example-chip" onclick="loadExample('!P || P')">!P || P</span>
-            <span class="example-chip" onclick="loadExample('P && !P')">P &amp;&amp; !P</span>
+            <span class="example-chip" onclick="loadExample('(P && Q) || ¬P || ¬Q')">(P &amp;&amp; Q) || ¬P || !Q</span>
+            <span class="example-chip" onclick="loadExample('¬P || P')">!P || P</span>
+            <span class="example-chip" onclick="loadExample('P && ¬P')">P &amp;&amp; !P</span>
             <span class="example-chip" onclick="loadExample('P -> Q')">P → Q</span>
             <span class="example-chip" onclick="loadExample('P <-> Q')">P ↔ Q</span>
         </div>
